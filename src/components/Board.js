@@ -32,7 +32,10 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false); // State to track game start
   const [winningNumber, setWinningNumber] = useState(null); // State to store the winning number
   const [currentChipValue, setCurrentChipValue] = useState(1); // State to track selected chip value
-
+  const formattedAddress = Address.parse(wallet.account.address).toString({
+    bounceable: false, // Set to true if you want a bounceable address
+    testOnly: false,   // Set to true if you are on testnet
+  });
   const isRed = (number) => red_numbers.includes(number);
 
   // Function to generate a random position within the cell
@@ -43,17 +46,18 @@ const Board = () => {
   };
 
   const setWallet = useState(null);
-  const connectWallet = async () => {
+  const tonConnect = new TonConnect({
+  manifestUrl: "https://yourwebsite.com/tonconnect-manifest.json"
+});
+
+async function connectWallet() {
   try {
-    await tonConnectUI.connectWallet();
-    const connectedWallet = await tonConnectUI.getWallet(); // Fetch updated wallet
-    console.log("Connected Wallet:", connectedWallet);
-    setWallet(connectedWallet);
+    await tonConnect.connectWallet();
+    console.log("Wallet connected!");
   } catch (error) {
-    console.error("Wallet connection failed:", error);
-    alert("Failed to connect wallet. Try again.");
+    console.error("Connection failed:", error);
   }
-    };
+}
 
   // Function to handle button clicks
   const handleClick = (value) => {
@@ -177,8 +181,8 @@ const Board = () => {
   <img src={RouletteImage} alt="Roulette" className="roulette-image" />
   {wallet ? (
     <span className="wallet-address">
-      {wallet.account.address.toString().slice(0, 5)}...
-      {wallet.account.address.toString().slice(-5)}
+      {formattedAddress.slice(0, 5)}...
+      {formattedAddress.slice(-5)}
     </span>
   ) : (
     <img
