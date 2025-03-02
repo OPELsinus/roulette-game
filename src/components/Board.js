@@ -179,16 +179,18 @@ const Board = () => {
       />
 
       {/* Wallet Connection Button */}
-      <img
-        src={TonWallet}
-        alt="Connect Wallet"
-        className="wallet-image"
-        onClick={connectWallet}
-      />
-
-      {/* Display Wallet Address */}
-      {wallet && (
-        <p>Connected Wallet: {wallet.account.address}</p>
+      {/* Replace Ton Wallet Logo with Address if Connected */}
+      {wallet ? (
+        <div className="wallet-address">
+          {wallet.account.address.slice(0, 5)}...{wallet.account.address.slice(-5)}
+        </div>
+      ) : (
+        <img
+          src={TonWallet}
+          alt="Connect Wallet"
+          className="wallet-image"
+          onClick={connectWallet}
+        />
       )}
 
       {/* Chip Value Selector */}

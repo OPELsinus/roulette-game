@@ -302,16 +302,6 @@
   margin-right: 10px;
 }
 
-/* Wallet Address */
-.wallet-address {
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  padding: 10px 20px;
-  border-radius: 5px;
-}
-
 .wallet-image:hover {
   transform: scale(1.1);
 }
@@ -333,4 +323,15 @@
   transform: translate(50%, 50%);
   width: 200px; /* Larger size when centered */
   z-index: 3; /* Ensure the image is above everything */
+}
+
+.wallet-address {
+  background-color: #282c34;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 20px;
 }
