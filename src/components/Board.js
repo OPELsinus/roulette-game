@@ -66,7 +66,7 @@ const Board = () => {
     const transaction = {
       messages: [
         {
-          address: 'YOUR_CONTRACT_ADDRESS', // Replace with your contract address
+          address: 'UQDpeRD6VmHoLuHt_vaXLbfVrIe2AfVX4iYtURxBkW4dlx0s', // Replace with your contract address
           amount: amount.toString(), // Amount in nanoton (1 TON = 1e9 nanoton)
         },
       ],

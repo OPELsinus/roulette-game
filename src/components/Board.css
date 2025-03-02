@@ -268,3 +268,46 @@
   color: #000; /* Black text for better visibility */
   color: white;
 }
+
+/* Roulette Header */
+.roulette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* Connect Wallet Button */
+.connect-wallet-button {
+  display: flex;
+  align-items: center;
+  background-color: #3498db; /* Blue color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.connect-wallet-button:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+}
+
+.ton-wallet-image {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+/* Wallet Address */
+.wallet-address {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  padding: 10px 20px;
+  border-radius: 5px;
+}
