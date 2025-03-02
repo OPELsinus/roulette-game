@@ -1,5 +1,3 @@
 {
-  "build": {
-    "output": "build"
-  }
+  "outputDirectory": "build"
 }
