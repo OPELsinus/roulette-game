@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
-import RouletteImage from './Roulette.png'; // Import the roulette image
+import RouletteImage from './Roulette.png';
+import TonWallet from './TonWallet.jpg';
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -41,6 +42,17 @@ const Board = () => {
     return { x, y };
   };
 
+  const setWallet = useState(null);
+  const connectWallet = async () => {
+    try {
+      await tonConnectUI.connectWallet();
+      setWallet(tonConnectUI.wallet); // ✅ This is now defined
+      console.log('Wallet connected:', tonConnectUI.wallet);
+    } catch (error) {
+      console.error('Wallet connection failed:', error);
+      alert('Failed to connect wallet. Try again.');
+    }
+  };
   // Function to handle button clicks
   const handleClick = (value) => {
     if (isGameStarted || !wallet) return; // Disable clicks when the game is started or wallet is not connected
@@ -67,7 +79,7 @@ const Board = () => {
       messages: [
         {
           address: 'UQDpeRD6VmHoLuHt_vaXLbfVrIe2AfVX4iYtURxBkW4dlx0s', // Replace with your contract address
-          amount: amount.toString(), // Amount in nanoton (1 TON = 1e9 nanoton)
+          amount: (amount * 1e6).toString(), // Amount in nanoton (1 TON = 1e9 nanoton)
         },
       ],
       validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
@@ -167,9 +179,12 @@ const Board = () => {
       />
 
       {/* Wallet Connection Button */}
-      {!wallet && (
-        <button onClick={() => tonConnectUI.connectWallet()}>Connect Wallet</button>
-      )}
+      <img
+        src={TonWallet}
+        alt="Connect Wallet"
+        className="wallet-image"
+        onClick={connectWallet}
+      />
 
       {/* Display Wallet Address */}
       {wallet && (

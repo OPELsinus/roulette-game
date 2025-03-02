@@ -311,3 +311,26 @@
   padding: 10px 20px;
   border-radius: 5px;
 }
+
+.wallet-image:hover {
+  transform: scale(1.1);
+}
+
+.wallet-image {
+  width: 70px; /* Adjust size as needed */
+  height: auto;
+  position: fixed; /* Position relative to the viewport */
+  top: 5%; /* Position at the top of the screen */
+  left: 56.5%;
+  transition: all 0.5s ease; /* Smooth transition */
+  border-radius: 20px; /* Rounded corners */
+  z-index: 2; /* Ensure the image is above other elements */
+}
+
+.wallet-image.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(50%, 50%);
+  width: 200px; /* Larger size when centered */
+  z-index: 3; /* Ensure the image is above everything */
+}
