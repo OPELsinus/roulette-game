@@ -3,7 +3,10 @@ import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
+import { Address } from '@ton/core';
+import { TonConnect } from '@tonconnect/sdk'; // Add this import
 
+console.log("Board component is rendering...");
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
   [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34], // First column
@@ -32,13 +35,19 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false); // State to track game start
   const [winningNumber, setWinningNumber] = useState(null); // State to store the winning number
   const [currentChipValue, setCurrentChipValue] = useState(1); // State to track selected chip value
-  const formattedAddress = Address.parse(wallet.account.address).toString({
-    bounceable: false, // Set to true if you want a bounceable address
-    testOnly: false,   // Set to true if you are on testnet
-  });
+  const formattedAddress = wallet?.account?.address
+  ? Address.parse(wallet.account.address).toString({
+      bounceable: false,
+      testOnly: false,
+    })
+  : 'Not connected';
+
   const isRed = (number) => red_numbers.includes(number);
 
-  const { disconnect } = useTonConnect();
+  const disconnect = () => {
+    tonConnectUI.disconnect();
+  };
+
 
   const handleDisconnect = () => {
     disconnect();  // This clears cached wallet data
@@ -50,7 +59,6 @@ const Board = () => {
     return { x, y };
   };
 
-  const setWallet = useState(null);
   const tonConnect = new TonConnect({
   manifestUrl: "https://yourwebsite.com/tonconnect-manifest.json"
 });
@@ -183,24 +191,26 @@ async function connectWallet() {
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
       <div className="roulette-header">
-  <img src={RouletteImage} alt="Roulette" className="roulette-image" />
-  {wallet ? (
-    <span className="wallet-address">
-      {formattedAddress.slice(0, 5)}...
-      {formattedAddress.slice(-5)}
-    </span>
-    <button className="disconnect-button" onClick={disconnect}>
-        Disconnect
-    </button>
-  ) : (
-    <img
-      src={TonWallet}
-      alt="Connect Wallet"
-      className="wallet-image"
-      onClick={connectWallet}
-    />
-  )}
-</div>
+          <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+          {wallet ? (
+              <div>
+                <span className="wallet-address">
+                  {formattedAddress.slice(0, 5)}...
+                  {formattedAddress.slice(-5)}
+                </span>
+                <button className="disconnect-button" onClick={disconnect}>
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <img
+                src={TonWallet}
+                alt="Connect Wallet"
+                className="wallet-image"
+                onClick={connectWallet}
+              />
+            )}
+      </div>
 
       {/* Chip Value Selector */}
       <div className="chip-value-selector">
