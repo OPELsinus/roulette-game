@@ -38,6 +38,11 @@ const Board = () => {
   });
   const isRed = (number) => red_numbers.includes(number);
 
+  const { disconnect } = useTonConnect();
+
+  const handleDisconnect = () => {
+    disconnect();  // This clears cached wallet data
+  };
   // Function to generate a random position within the cell
   const getRandomPosition = () => {
     const x = Math.random() * 80; // Random x position (0% to 80%)
@@ -184,6 +189,9 @@ async function connectWallet() {
       {formattedAddress.slice(0, 5)}...
       {formattedAddress.slice(-5)}
     </span>
+    <button className="disconnect-button" onClick={disconnect}>
+        Disconnect
+    </button>
   ) : (
     <img
       src={TonWallet}

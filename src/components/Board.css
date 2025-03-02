@@ -328,3 +328,20 @@
   display: inline-block;
   margin-top: 20px;
 }
+
+.disconnect-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.disconnect-button:hover {
+  background-color: #c0392b;
+}
