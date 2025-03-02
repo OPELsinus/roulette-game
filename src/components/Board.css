@@ -15,15 +15,11 @@
 }
 
 /* Roulette Image Styling */
+
 .roulette-image {
+  margin-left: 35%;
   width: 100px; /* Adjust size as needed */
   height: auto;
-  position: fixed; /* Position relative to the viewport */
-  top: 10px; /* Position at the top of the screen */
-  left: 50%;
-  transform: translateX(-50%);
-  transition: all 0.5s ease; /* Smooth transition */
-  z-index: 2; /* Ensure the image is above other elements */
 }
 
 .roulette-image.center {
@@ -166,7 +162,7 @@
 /* Lobby Name Styling */
 .lobby-name {
   position: absolute;
-  top: 13.3%; /* Adjust as needed */
+  top: 24%; /* Adjust as needed */
   right: 8%; /* Adjust as needed */
   font-size: 18px;
   font-weight: bold;
@@ -272,9 +268,11 @@
 /* Roulette Header */
 .roulette-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  align-items: center; /* Aligns items to the same Y level */
+  justify-content: space-between; /* Pushes elements apart */
+  width: 100%;
+  padding: 10px;
+  position: relative; /* Keeps them within the header */
 }
 
 /* Connect Wallet Button */
@@ -307,14 +305,9 @@
 }
 
 .wallet-image {
-  width: 70px; /* Adjust size as needed */
+  width: 70px;
   height: auto;
-  position: fixed; /* Position relative to the viewport */
-  top: 5%; /* Position at the top of the screen */
-  left: 56.5%;
-  transition: all 0.5s ease; /* Smooth transition */
   border-radius: 20px; /* Rounded corners */
-  z-index: 2; /* Ensure the image is above other elements */
 }
 
 .wallet-image.center {

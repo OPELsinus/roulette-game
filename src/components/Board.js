@@ -44,15 +44,17 @@ const Board = () => {
 
   const setWallet = useState(null);
   const connectWallet = async () => {
-    try {
-      await tonConnectUI.connectWallet();
-      setWallet(tonConnectUI.wallet); // ✅ This is now defined
-      console.log('Wallet connected:', tonConnectUI.wallet);
-    } catch (error) {
-      console.error('Wallet connection failed:', error);
-      alert('Failed to connect wallet. Try again.');
-    }
-  };
+  try {
+    await tonConnectUI.connectWallet();
+    const connectedWallet = await tonConnectUI.getWallet(); // Fetch updated wallet
+    console.log("Connected Wallet:", connectedWallet);
+    setWallet(connectedWallet);
+  } catch (error) {
+    console.error("Wallet connection failed:", error);
+    alert("Failed to connect wallet. Try again.");
+  }
+    };
+
   // Function to handle button clicks
   const handleClick = (value) => {
     if (isGameStarted || !wallet) return; // Disable clicks when the game is started or wallet is not connected
@@ -171,27 +173,22 @@ const Board = () => {
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
-      {/* Roulette Image */}
-      <img
-        src={RouletteImage}
-        alt="Roulette"
-        className={`roulette-image ${isGameStarted ? 'center' : ''}`}
-      />
-
-      {/* Wallet Connection Button */}
-      {/* Replace Ton Wallet Logo with Address if Connected */}
-      {wallet ? (
-        <div className="wallet-address">
-          {wallet.account.address.slice(0, 5)}...{wallet.account.address.slice(-5)}
-        </div>
-      ) : (
-        <img
-          src={TonWallet}
-          alt="Connect Wallet"
-          className="wallet-image"
-          onClick={connectWallet}
-        />
-      )}
+      <div className="roulette-header">
+  <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+  {wallet ? (
+    <span className="wallet-address">
+      {wallet.account.address.toString().slice(0, 5)}...
+      {wallet.account.address.toString().slice(-5)}
+    </span>
+  ) : (
+    <img
+      src={TonWallet}
+      alt="Connect Wallet"
+      className="wallet-image"
+      onClick={connectWallet}
+    />
+  )}
+</div>
 
       {/* Chip Value Selector */}
       <div className="chip-value-selector">
