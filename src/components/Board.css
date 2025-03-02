@@ -1,0 +1,270 @@
+/* General Styles */
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%; /* Reduced size by 10% */
+  max-width: 360px; /* Adjusted for 10% smaller size */
+  margin: 120px auto 0; /* Move the desk lower (120px from the top) */
+  font-family: 'Arial', sans-serif;
+  background: #2c3e50; /* Dark background for contrast */
+  padding: 15px; /* Reduced padding */
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative; /* Ensure other elements are positioned relative to the board */
+}
+
+/* Roulette Image Styling */
+.roulette-image {
+  width: 100px; /* Adjust size as needed */
+  height: auto;
+  position: fixed; /* Position relative to the viewport */
+  top: 10px; /* Position at the top of the screen */
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.5s ease; /* Smooth transition */
+  z-index: 2; /* Ensure the image is above other elements */
+}
+
+.roulette-image.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; /* Larger size when centered */
+  z-index: 3; /* Ensure the image is above everything */
+}
+
+/* Zero Row */
+.zero-row {
+  width: calc(59%); /* Zero width matches one column */
+  margin-bottom: 10px;
+  margin-left: calc(-41%); /* Position zero above the second column */
+  display: flex;
+  justify-content: center; /* Center the zero cell horizontally */
+}
+
+.zero-row .cell {
+  background: #27ae60; /* Green for zero */
+  color: white;
+  font-size: 22px; /* Slightly smaller font */
+  font-weight: bold;
+  height: 50px; /* Reduced height */
+  width: 100%; /* Zero cell takes full width of its container */
+  border-radius: 8px; /* Slightly smaller radius */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+  border: 1px dashed #f5f5dc; /* Milk-colored border */
+}
+
+/* Main Grid: Numbers + Special Buttons */
+.main-grid {
+  display: flex;
+  width: 100%;
+  gap: 8px; /* Reduced spacing between number columns and special columns */
+}
+
+/* Number Columns */
+.number-columns {
+  display: flex;
+  gap: 4px; /* Reduced spacing between columns */
+  flex: 3; /* Takes 3/5 of the space */
+}
+
+.number-columns .column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reduced spacing between cells */
+  flex: 1;
+}
+
+.number-columns .cell {
+  background: #34495e; /* Dark gray for numbers */
+  color: white;
+  font-size: 16px; /* Slightly smaller font */
+  font-weight: bold;
+  height: 40px; /* Reduced height */
+  border-radius: 6px; /* Slightly smaller radius */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease;
+  border: 1px dashed #f5f5dc; /* Milk-colored border */
+}
+
+.number-columns .cell.red {
+  background: #e74c3c; /* Red for red numbers */
+}
+
+.number-columns .cell.black {
+  background: #2c3e50; /* Black for black numbers */
+}
+
+.number-columns .cell:hover {
+  background: #1abc9c; /* Hover effect */
+  cursor: pointer;
+}
+
+/* Special Buttons Columns */
+.special-columns {
+  display: flex;
+  gap: 4px; /* Reduced spacing between columns */
+  flex: 2; /* Takes 2/5 of the space */
+}
+
+.special-columns .column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reduced spacing between cells */
+  flex: 1;
+}
+
+.special-columns .cell {
+  background: #3498db; /* Blue for special buttons */
+  color: white;
+  font-size: 14px; /* Slightly smaller font */
+  font-weight: bold;
+  height: 40px; /* Reduced height */
+  border-radius: 6px; /* Slightly smaller radius */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease;
+  border: 1px dashed #f5f5dc; /* Milk-colored border */
+}
+
+.special-columns .cell:hover {
+  background: #2980b9; /* Darker blue on hover */
+  cursor: pointer;
+}
+
+/* Adjust special buttons to fit properly */
+.special-columns .cell {
+  flex: 1; /* Ensure buttons stretch to fill the column */
+  min-width: 0; /* Allow buttons to shrink if needed */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+/* Chip Styling */
+.chip {
+  width: 20px;
+  height: 20px;
+  background-color: #ffd700; /* Gold color for the chip */
+  border-radius: 50%; /* Make it round */
+  position: absolute;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+}
+
+/* Ensure cells have relative positioning for chip placement */
+.cell {
+  position: relative;
+}
+
+/* Lobby Name Styling */
+.lobby-name {
+  position: absolute;
+  top: 13.3%; /* Adjust as needed */
+  right: 8%; /* Adjust as needed */
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff; /* White text */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+/* Start Game Button Styling */
+.start-game-button {
+  margin-top: 20px; /* Space below the desk */
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #3498db; /* Blue color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 2; /* Ensure the button is above other elements */
+}
+
+.start-game-button:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+}
+
+/* Game Started State */
+.board.game-started {
+  position: relative;
+}
+
+.board.game-started::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  z-index: 1; /* Ensure the overlay is above the background */
+  pointer-events: none; /* Disable clicks on the overlay */
+}
+
+.board.game-started .zero-row,
+.board.game-started .main-grid,
+.board.game-started .start-game-button {
+  opacity: 0.5; /* Reduce opacity of everything except the image */
+  pointer-events: none; /* Disable clicks on background elements */
+}
+/* Chip Value Selector Styling */
+.chip-value-selector {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.chip-value-selector p {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.chip-value-button {
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #3498db; /* Blue color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: background-color 0.3s ease;
+}
+
+.chip-value-button.active {
+  background-color: #2980b9; /* Darker blue for active button */
+}
+
+.chip-value-button:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+}
+
+/* Chip Styling */
+.chip {
+  width: 20px;
+  height: 20px;
+  background-color: #ffd700; /* Gold color for the chip */
+  border-radius: 50%; /* Make it round */
+  position: absolute;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 8px; /* Set font size to 8 */
+  font-weight: bold;
+  color: #000; /* Black text for better visibility */
+  color: white;
+}
