@@ -1,6 +1,6 @@
 import React from 'react';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
-import Board from './components/Board'; // Adjust the import path as needed
+import Board from './components/Board';
 
 function App() {
   return (
