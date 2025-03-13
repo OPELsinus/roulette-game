@@ -1,7 +1,5 @@
 {
   "url": "https://roulette-game-pearl.vercel.app/",
   "name": "Roulette Desk",
-  "iconUrl": "https://roulette-game-pearl.vercel.app/icon.png",
-  "termsOfUseUrl": "https://roulette-game-pearl.vercel.app/terms.html",
-  "privacyPolicyUrl": "https://roulette-game-pearl.vercel.app/privacy.html"
+  "iconUrl": "https://roulette-game-pearl.vercel.app/icon.png"
 }
