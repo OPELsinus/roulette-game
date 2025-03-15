@@ -132,7 +132,7 @@ const Board = () => {
           ))}
         </div>
         {/* Lobby Name */}
-        <div className="lobby-name">Lobby Name</div>
+        <div className="lobby-name">Lobby Name Lol</div>
       </div>
 
       {/* Main Grid: Numbers + Special Buttons */}
