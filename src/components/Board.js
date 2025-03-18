@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
-import { Address } from '@ton/core'; // Import Address from @ton/core
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
 import ClearImage from './Clear.png'; // Add a clear image
 import UndoImage from './Undo.png'; // Add an undo image
+import { Address } from '@ton/core';
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -43,8 +43,8 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)); // Ensure x is within 0-100%
-    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)); // Ensure y is within 0-100%
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20; // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20; // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
@@ -79,13 +79,10 @@ const Board = () => {
     }
   };
 
-  const formatAddress = (rawAddress) => {
-    if (!rawAddress) return '';
+  const formatAddress = (address) => {
+    if (!address) return '';
 
-    // Convert the raw address to a user-friendly format
-    const address = Address.parse(rawAddress).toString();
-
-    // Extract the first 5 and last 5 characters
+    const address = Address.parse(address).toString();
     return `${address.slice(0, 5)}...${address.slice(-5)}`;
   };
 
