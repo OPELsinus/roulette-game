@@ -82,8 +82,8 @@ const Board = () => {
   const formatAddress = (address) => {
     if (!address) return '';
 
-    const address = Address.parse(address).toString();
-    return `${address.slice(0, 5)}...${address.slice(-5)}`;
+    const address1 = Address.parse(address).toString();
+    return `${address1.slice(0, 5)}...${address1.slice(-5)}`;
   };
 
   const handleClear = () => {
