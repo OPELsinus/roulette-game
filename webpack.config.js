@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin'); // Import CopyWebpackPlugin
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
@@ -9,6 +9,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'build'), // Output to 'build' directory
     clean: true,
+    publicPath: '/', // Ensure correct paths for assets
   },
   module: {
     rules: [
@@ -24,13 +25,17 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
+        generator: {
+          filename: 'images/[name][ext]', // Organize images in a subdirectory
+        },
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
+      template: './public/index.html', // Use the correct template path
       title: 'Roulette Game',
+      favicon: './public/favicon.ico', // Ensure favicon is included
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'], // Polyfill Buffer
@@ -58,5 +63,6 @@ module.exports = {
     port: 9000,
     open: true,
     hot: true,
+    historyApiFallback: true, // Enable client-side routing
   },
 };
