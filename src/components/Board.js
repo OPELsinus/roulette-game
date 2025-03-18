@@ -5,6 +5,7 @@ import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
 import ClearImage from './Clear.png'; // Add a clear image
 import UndoImage from './Undo.png'; // Add an undo image
+import { Address } from '@ton/core';
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -78,10 +79,15 @@ const Board = () => {
     }
   };
 
-  const formatAddress = (address) => {
-    if (!address) return '';
-    return `${formatAddress(address).slice(0, 4)}...${address.slice(-4)}`;
-  };
+  const formatAddress = (rawAddress) => {
+      if (!rawAddress) return '';
+
+      // Convert the raw address to a user-friendly format
+      const address = Address.parse(rawAddress).toString();
+
+      // Extract the first 5 and last 5 characters
+      return `${address.slice(0, 5)}...${address.slice(-5)}`;
+    };
 
   const handleClear = () => {
     setSelectedChips({});
