@@ -5,6 +5,7 @@ import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
 import ClearImage from './Clear.png'; // Add a clear image
 import UndoImage from './Undo.png'; // Add an undo image
+import { Address } from '@ton/core';
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -209,7 +210,7 @@ const Board = () => {
         {wallet ? (
           <div className="wallet-info">
             <span className="wallet-address">
-              {formatAddress(wallet.account.address.toString())}
+                {wallet.account.address.slice(0, 5)}...{wallet.account.address.slice(-5)}
             </span>
             <button className="disconnect-button" onClick={disconnectWallet}>
               Disconnect
