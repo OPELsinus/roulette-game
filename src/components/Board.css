@@ -348,14 +348,14 @@
 
 .action-buttons {
   position: relative;
-  margin-left: 40%;
+  margin-left: 400px;
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
 .action-button {
-  width: 40px; /* Adjust as needed */
-  height: 40px; /* Adjust as needed */
+  width: 50px; /* Adjust as needed */
+  height: 50px; /* Adjust as needed */
   cursor: pointer;
 }
