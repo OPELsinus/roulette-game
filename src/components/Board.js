@@ -42,8 +42,8 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)); // Ensure x is within 0-100%
-    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)); // Ensure y is within 0-100%
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20; // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20; // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
