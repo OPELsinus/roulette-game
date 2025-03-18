@@ -210,7 +210,7 @@ const Board = () => {
         {wallet ? (
           <div className="wallet-info">
             <span className="wallet-address">
-                {wallet.account.address.slice(0, 5)}...{wallet.account.address.slice(-5)}
+              {formatAddress(wallet.account.address.toString())}
             </span>
             <button className="disconnect-button" onClick={disconnectWallet}>
               Disconnect
