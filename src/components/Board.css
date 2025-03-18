@@ -5,7 +5,7 @@
   align-items: center;
   width: 90%; /* Reduced size by 10% */
   max-width: 360px; /* Adjusted for 10% smaller size */
-  margin: 120px auto 0; /* Move the desk lower (120px from the top) */
+  margin: 0px auto 0; /* Move the desk lower (120px from the top) */
   font-family: 'Arial', sans-serif;
   background: #2c3e50; /* Dark background for contrast */
   padding: 15px; /* Reduced padding */
@@ -44,7 +44,7 @@
   color: white;
   font-size: 22px; /* Slightly smaller font */
   font-weight: bold;
-  height: 50px; /* Reduced height */
+  height: 40px; /* Reduced height */
   width: 100%; /* Zero cell takes full width of its container */
   border-radius: 8px; /* Slightly smaller radius */
   display: flex;
@@ -327,4 +327,21 @@
   border-radius: 12px;
   display: inline-block;
   margin-top: 20px;
+}
+
+.disconnect-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.disconnect-button:hover {
+  background-color: #c0392b;
 }
