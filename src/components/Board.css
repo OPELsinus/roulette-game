@@ -347,7 +347,7 @@
 }
 
 .action-buttons {
-  position: relative;
+  position: absolute;
   margin-left: 400px;
   display: flex;
   gap: 10px;
