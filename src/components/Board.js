@@ -32,6 +32,7 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [winningNumber, setWinningNumber] = useState(null);
   const [currentChipValue, setCurrentChipValue] = useState(1);
+  const [chipHistory, setChipHistory] = useState([]); // To track chip history for undo
 
   const isRed = (number) => red_numbers.includes(number);
 
@@ -39,19 +40,23 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100; // X coordinate as percentage
-    const y = ((event.clientY - rect.top) / rect.height) * 100; // Y coordinate as percentage
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)); // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)); // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
       position: { x, y },
       value: currentChipValue,
+      cell: value, // Track which cell the chip belongs to
     };
 
     setSelectedChips((prev) => ({
       ...prev,
       [value]: [...(prev[value] || []), newChip],
     }));
+
+    // Update chip history for undo functionality
+    setChipHistory((prev) => [...prev, { cell: value, chip: newChip }]);
   };
 
   const connectWallet = async () => {
@@ -74,6 +79,31 @@ const Board = () => {
   const formatAddress = (address) => {
     if (!address) return '';
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  const handleClear = () => {
+    setSelectedChips({});
+    setChipHistory([]);
+  };
+
+  const handleUndo = () => {
+    if (chipHistory.length === 0) return;
+
+    const lastAction = chipHistory[chipHistory.length - 1];
+    const updatedChips = { ...selectedChips };
+
+    // Remove the last chip from the cell
+    updatedChips[lastAction.cell] = updatedChips[lastAction.cell].filter(
+      (chip) => chip.id !== lastAction.chip.id
+    );
+
+    // If the cell is empty, remove it from the object
+    if (updatedChips[lastAction.cell].length === 0) {
+      delete updatedChips[lastAction.cell];
+    }
+
+    setSelectedChips(updatedChips);
+    setChipHistory((prev) => prev.slice(0, -1)); // Remove the last action from history
   };
 
   const sendTonTokens = async (amount) => {
@@ -165,6 +195,7 @@ const Board = () => {
       setIsGameStarted(false);
       setSelectedChips({});
       setWinningNumber(null);
+      setChipHistory([]); // Clear chip history after game ends
     }, 3000);
   };
 
@@ -220,7 +251,14 @@ const Board = () => {
             </div>
           ))}
         </div>
-        <div className="lobby-name">Lobby Name</div>
+        <div className="action-buttons">
+          <button className="clear-button" onClick={handleClear}>
+            Clear
+          </button>
+          <button className="undo-button" onClick={handleUndo}>
+            Undo
+          </button>
+        </div>
       </div>
 
       <div className="main-grid">
