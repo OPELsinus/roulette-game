@@ -35,10 +35,23 @@ const Board = () => {
 
   const isRed = (number) => red_numbers.includes(number);
 
-  const getRandomPosition = () => {
-    const x = Math.random() * 80;
-    const y = Math.random() * 80;
-    return { x, y };
+  const handleClick = (value, event) => {
+    if (isGameStarted || !wallet) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100; // X coordinate as percentage
+    const y = ((event.clientY - rect.top) / rect.height) * 100; // Y coordinate as percentage
+
+    const newChip = {
+      id: Date.now(),
+      position: { x, y },
+      value: currentChipValue,
+    };
+
+    setSelectedChips((prev) => ({
+      ...prev,
+      [value]: [...(prev[value] || []), newChip],
+    }));
   };
 
   const connectWallet = async () => {
@@ -50,17 +63,17 @@ const Board = () => {
     }
   };
 
-  const handleClick = (value) => {
-    if (isGameStarted || !wallet) return;
-    const newChip = {
-      id: Date.now(),
-      position: getRandomPosition(),
-      value: currentChipValue,
-    };
-    setSelectedChips((prev) => ({
-      ...prev,
-      [value]: [...(prev[value] || []), newChip],
-    }));
+  const disconnectWallet = async () => {
+    try {
+      await tonConnectUI.disconnect();
+    } catch (error) {
+      console.error("Wallet disconnection failed:", error);
+    }
+  };
+
+  const formatAddress = (address) => {
+    if (!address) return '';
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
   const sendTonTokens = async (amount) => {
@@ -160,10 +173,14 @@ const Board = () => {
       <div className="roulette-header">
         <img src={RouletteImage} alt="Roulette" className="roulette-image" />
         {wallet ? (
-          <span className="wallet-address">
-            {wallet.account.address.toString().slice(0, 5)}...
-            {wallet.account.address.toString().slice(-5)}
-          </span>
+          <div className="wallet-info">
+            <span className="wallet-address">
+              {formatAddress(wallet.account.address.toString())}
+            </span>
+            <button className="disconnect-button" onClick={disconnectWallet}>
+              Disconnect
+            </button>
+          </div>
         ) : (
           <img
             src={TonWallet}
@@ -188,7 +205,7 @@ const Board = () => {
       </div>
 
       <div className="zero-row">
-        <div className="cell zero" onClick={() => handleClick(0)}>
+        <div className="cell zero" onClick={(e) => handleClick(0, e)}>
           0
           {selectedChips[0]?.map((chip) => (
             <div
@@ -214,7 +231,7 @@ const Board = () => {
                 <div
                   key={number}
                   className={`cell number ${isRed(number) ? 'red' : 'black'}`}
-                  onClick={() => handleClick(number)}
+                  onClick={(e) => handleClick(number, e)}
                 >
                   {number}
                   {selectedChips[number]?.map((chip) => (
@@ -241,7 +258,7 @@ const Board = () => {
               <div
                 key={index}
                 className="cell special"
-                onClick={() => handleClick(button.value)}
+                onClick={(e) => handleClick(button.value, e)}
               >
                 {button.label}
                 {selectedChips[button.value]?.map((chip) => (
@@ -264,7 +281,7 @@ const Board = () => {
               <div
                 key={index}
                 className="cell special"
-                onClick={() => handleClick(button.value)}
+                onClick={(e) => handleClick(button.value, e)}
               >
                 {button.label}
                 {selectedChips[button.value]?.map((chip) => (
@@ -287,7 +304,7 @@ const Board = () => {
               <div
                 key={index}
                 className="cell special"
-                onClick={() => handleClick(button.value)}
+                onClick={(e) => handleClick(button.value, e)}
               >
                 {button.label}
                 {selectedChips[button.value]?.map((chip) => (
