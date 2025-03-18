@@ -3,6 +3,8 @@ import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
+import ClearImage from './Clear.png'; // Add a clear image
+import UndoImage from './Undo.png'; // Add an undo image
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -40,8 +42,8 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 10; // Ensure x is within 0-100%
-    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 10; // Ensure y is within 0-100%
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)); // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)); // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
@@ -252,12 +254,18 @@ const Board = () => {
           ))}
         </div>
         <div className="action-buttons">
-          <button className="clear-button" onClick={handleClear}>
-            Clear
-          </button>
-          <button className="undo-button" onClick={handleUndo}>
-            Undo
-          </button>
+          <img
+            src={ClearImage}
+            alt="Clear"
+            className="action-button"
+            onClick={handleClear}
+          />
+          <img
+            src={UndoImage}
+            alt="Undo"
+            className="action-button"
+            onClick={handleUndo}
+          />
         </div>
       </div>
 

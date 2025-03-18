@@ -345,3 +345,21 @@
 .disconnect-button:hover {
   background-color: #c0392b;
 }
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.action-button {
+  width: 40px; /* Adjust as needed */
+  height: 40px; /* Adjust as needed */
+  cursor: pointer;
+}
+
+.cell.zero {
+  width: 100px; /* Fixed width for zero cell */
+  height: 100px; /* Fixed height for zero cell */
+  flex-shrink: 0; /* Prevent resizing */
+}
