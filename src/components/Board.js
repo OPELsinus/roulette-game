@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
@@ -28,49 +28,41 @@ const chipValues = [1, 5, 10, 25, 50, 100]; // Available chip values
 const Board = () => {
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
-  const [selectedChips, setSelectedChips] = useState({}); // Object to store chips for each cell
-  const [isGameStarted, setIsGameStarted] = useState(false); // State to track game start
-  const [winningNumber, setWinningNumber] = useState(null); // State to store the winning number
-  const [currentChipValue, setCurrentChipValue] = useState(1); // State to track selected chip value
+  const [selectedChips, setSelectedChips] = useState({});
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [winningNumber, setWinningNumber] = useState(null);
+  const [currentChipValue, setCurrentChipValue] = useState(1);
 
   const isRed = (number) => red_numbers.includes(number);
 
-  // Function to generate a random position within the cell
   const getRandomPosition = () => {
-    const x = Math.random() * 80; // Random x position (0% to 80%)
-    const y = Math.random() * 80; // Random y position (0% to 80%)
+    const x = Math.random() * 80;
+    const y = Math.random() * 80;
     return { x, y };
   };
 
-  const setWallet = useState(null);
   const connectWallet = async () => {
-  try {
-    await tonConnectUI.connectWallet();
-    const connectedWallet = await tonConnectUI.getWallet(); // Fetch updated wallet
-    console.log("Connected Wallet:", connectedWallet);
-    setWallet(connectedWallet);
-  } catch (error) {
-    console.error("Wallet connection failed:", error);
-    alert("Failed to connect wallet. Try again.");
-  }
-    };
+    try {
+      await tonConnectUI.connectWallet();
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      alert("Failed to connect wallet. Try again.");
+    }
+  };
 
-  // Function to handle button clicks
   const handleClick = (value) => {
-    if (isGameStarted || !wallet) return; // Disable clicks when the game is started or wallet is not connected
-    console.log(`Button clicked: ${value}`);
+    if (isGameStarted || !wallet) return;
     const newChip = {
-      id: Date.now(), // Unique ID for each chip
-      position: getRandomPosition(), // Random position within the cell
-      value: currentChipValue, // Store the chip value
+      id: Date.now(),
+      position: getRandomPosition(),
+      value: currentChipValue,
     };
     setSelectedChips((prev) => ({
       ...prev,
-      [value]: [...(prev[value] || []), newChip], // Add new chip to the cell
+      [value]: [...(prev[value] || []), newChip],
     }));
   };
 
-  // Function to send TON tokens
   const sendTonTokens = async (amount) => {
     if (!wallet) {
       alert('Please connect your wallet first.');
@@ -80,11 +72,11 @@ const Board = () => {
     const transaction = {
       messages: [
         {
-          address: 'UQDpeRD6VmHoLuHt_vaXLbfVrIe2AfVX4iYtURxBkW4dlx0s', // Replace with your contract address
-          amount: (amount * 1e6).toString(), // Amount in nanoton (1 TON = 1e9 nanoton)
+          address: 'UQDpeRD6VmHoLuHt_vaXLbfVrIe2AfVX4iYtURxBkW4dlx0s',
+          amount: (amount * 1e6).toString(),
         },
       ],
-      validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
+      validUntil: Math.floor(Date.now() / 1000) + 300,
     };
 
     try {
@@ -95,27 +87,22 @@ const Board = () => {
     }
   };
 
-  // Function to handle Start Game button click
   const handleStartGame = async () => {
     if (!wallet) {
       alert('Please connect your wallet first.');
       return;
     }
 
-    // Calculate total bet amount
     const totalBet = Object.values(selectedChips).reduce((sum, chips) => {
       return sum + chips.reduce((chipSum, chip) => chipSum + chip.value, 0);
     }, 0);
 
-    // Send the bet amount to the contract
-    await sendTonTokens(totalBet * 1e9); // Convert to nanoton
+    await sendTonTokens(totalBet * 1e9);
 
-    // Generate a random winning number (0 to 36)
     const randomNumber = Math.floor(Math.random() * 37);
-    setWinningNumber(randomNumber); // Set the winning number
-    setIsGameStarted(true); // Trigger the transition
+    setWinningNumber(randomNumber);
+    setIsGameStarted(true);
 
-    // Check if the player won
     const selectedValues = Object.keys(selectedChips);
     let prizePool = 0;
     let hasWon = false;
@@ -123,74 +110,70 @@ const Board = () => {
     selectedValues.forEach((value) => {
       if (value === 'odd' && randomNumber % 2 !== 0 && randomNumber !== 0) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for odd
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (value === 'even' && randomNumber % 2 === 0 && randomNumber !== 0) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for even
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (value === 'red' && red_numbers.includes(randomNumber)) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for red
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (value === 'black' && !red_numbers.includes(randomNumber) && randomNumber !== 0) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for black
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (value === '1-12' && randomNumber >= 1 && randomNumber <= 12) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 1-12
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
       } else if (value === '13-24' && randomNumber >= 13 && randomNumber <= 24) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 13-24
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
       } else if (value === '25-36' && randomNumber >= 25 && randomNumber <= 36) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 25-36
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
       } else if (value === '1-18' && randomNumber >= 1 && randomNumber <= 18) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for 1-18
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (value === '19-36' && randomNumber >= 19 && randomNumber <= 36) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for 19-36
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
       } else if (Number(value) === randomNumber) {
         hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 36; // 36x payout for exact number
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 36;
       }
     });
 
-    // Log the result
     if (hasWon) {
       console.log(`You won! Winning number: ${randomNumber}. Prize pool: $${prizePool}`);
-      // Send the prize pool to the player's wallet
-      await sendTonTokens(prizePool * 1e9); // Convert to nanoton
+      await sendTonTokens(prizePool * 1e9);
     } else {
       console.log(`You lost. Winning number: ${randomNumber}. Prize pool: $0`);
     }
 
-    // Reset the game after 3 seconds
     setTimeout(() => {
-      setIsGameStarted(false); // Re-enable clicks
-      setSelectedChips({}); // Remove all chips
-      setWinningNumber(null); // Clear the winning number
-    }, 3000); // 3-second delay before resetting
+      setIsGameStarted(false);
+      setSelectedChips({});
+      setWinningNumber(null);
+    }, 3000);
   };
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
       <div className="roulette-header">
-  <img src={RouletteImage} alt="Roulette" className="roulette-image" />
-  {wallet ? (
-    <span className="wallet-address">
-      {wallet.account.address.toString().slice(0, 5)}...
-      {wallet.account.address.toString().slice(-5)}
-    </span>
-  ) : (
-    <img
-      src={TonWallet}
-      alt="Connect Wallet"
-      className="wallet-image"
-      onClick={connectWallet}
-    />
-  )}
-</div>
+        <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+        {wallet ? (
+          <span className="wallet-address">
+            {wallet.account.address.toString().slice(0, 5)}...
+            {wallet.account.address.toString().slice(-5)}
+          </span>
+        ) : (
+          <img
+            src={TonWallet}
+            alt="Connect Wallet"
+            className="wallet-image"
+            onClick={connectWallet}
+          />
+        )}
+      </div>
 
-      {/* Chip Value Selector */}
       <div className="chip-value-selector">
         <p>Select Chip Value:</p>
         {chipValues.map((value) => (
@@ -204,7 +187,6 @@ const Board = () => {
         ))}
       </div>
 
-      {/* Zero Row */}
       <div className="zero-row">
         <div className="cell zero" onClick={() => handleClick(0)}>
           0
@@ -217,17 +199,14 @@ const Board = () => {
                 top: `${chip.position.y}%`,
               }}
             >
-              ${chip.value} {/* Display chip value */}
+              ${chip.value}
             </div>
           ))}
         </div>
-        {/* Lobby Name */}
         <div className="lobby-name">Lobby Name</div>
       </div>
 
-      {/* Main Grid: Numbers + Special Buttons */}
       <div className="main-grid">
-        {/* Number Columns */}
         <div className="number-columns">
           {numbers.map((column, colIndex) => (
             <div key={colIndex} className="column">
@@ -247,7 +226,7 @@ const Board = () => {
                         top: `${chip.position.y}%`,
                       }}
                     >
-                      ${chip.value} {/* Display chip value */}
+                      ${chip.value}
                     </div>
                   ))}
                 </div>
@@ -256,7 +235,6 @@ const Board = () => {
           ))}
         </div>
 
-        {/* Special Buttons Columns */}
         <div className="special-columns">
           <div className="column">
             {specialButtons.slice(0, 3).map((button, index) => (
@@ -275,7 +253,7 @@ const Board = () => {
                       top: `${chip.position.y}%`,
                     }}
                   >
-                    ${chip.value} {/* Display chip value */}
+                    ${chip.value}
                   </div>
                 ))}
               </div>
@@ -298,7 +276,7 @@ const Board = () => {
                       top: `${chip.position.y}%`,
                     }}
                   >
-                    ${chip.value} {/* Display chip value */}
+                    ${chip.value}
                   </div>
                 ))}
               </div>
@@ -321,7 +299,7 @@ const Board = () => {
                       top: `${chip.position.y}%`,
                     }}
                   >
-                    ${chip.value} {/* Display chip value */}
+                    ${chip.value}
                   </div>
                 ))}
               </div>
@@ -330,7 +308,6 @@ const Board = () => {
         </div>
       </div>
 
-      {/* Start Game Button */}
       <button className="start-game-button" onClick={handleStartGame}>
         Start Game
       </button>
