@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
-import { Address } from '@ton/core';
-
-console.log("Board component is rendering...");
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -35,70 +32,163 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false); // State to track game start
   const [winningNumber, setWinningNumber] = useState(null); // State to store the winning number
   const [currentChipValue, setCurrentChipValue] = useState(1); // State to track selected chip value
-  const formattedAddress = wallet?.account?.address
-    ? Address.parse(wallet.account.address).toString({
-        bounceable: false,
-        testOnly: false,
-      })
-    : 'Not connected';
 
   const isRed = (number) => red_numbers.includes(number);
 
-  const disconnect = () => {
-    tonConnectUI.disconnect();
-  };
-
-  const handleDisconnect = () => {
-    disconnect(); // This clears cached wallet data
-  };
-
+  // Function to generate a random position within the cell
   const getRandomPosition = () => {
     const x = Math.random() * 80; // Random x position (0% to 80%)
     const y = Math.random() * 80; // Random y position (0% to 80%)
     return { x, y };
   };
 
+  const setWallet = useState(null);
+  const connectWallet = async () => {
+  try {
+    await tonConnectUI.connectWallet();
+    const connectedWallet = await tonConnectUI.getWallet(); // Fetch updated wallet
+    console.log("Connected Wallet:", connectedWallet);
+    setWallet(connectedWallet);
+  } catch (error) {
+    console.error("Wallet connection failed:", error);
+    alert("Failed to connect wallet. Try again.");
+  }
+    };
+
+  // Function to handle button clicks
   const handleClick = (value) => {
     if (isGameStarted || !wallet) return; // Disable clicks when the game is started or wallet is not connected
-    console.log(`Cell clicked: ${value}`); // Debugging log
+    console.log(`Button clicked: ${value}`);
     const newChip = {
       id: Date.now(), // Unique ID for each chip
       position: getRandomPosition(), // Random position within the cell
       value: currentChipValue, // Store the chip value
     };
-    setSelectedChips((prev) => {
-      const newState = {
-        ...prev,
-        [value]: [...(prev[value] || []), newChip], // Add new chip to the cell
-      };
-      console.log('Updated selectedChips:', newState); // Debugging log
-      return newState;
+    setSelectedChips((prev) => ({
+      ...prev,
+      [value]: [...(prev[value] || []), newChip], // Add new chip to the cell
+    }));
+  };
+
+  // Function to send TON tokens
+  const sendTonTokens = async (amount) => {
+    if (!wallet) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
+    const transaction = {
+      messages: [
+        {
+          address: 'UQDpeRD6VmHoLuHt_vaXLbfVrIe2AfVX4iYtURxBkW4dlx0s', // Replace with your contract address
+          amount: (amount * 1e6).toString(), // Amount in nanoton (1 TON = 1e9 nanoton)
+        },
+      ],
+      validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
+    };
+
+    try {
+      await tonConnectUI.sendTransaction(transaction);
+      console.log('Transaction sent successfully');
+    } catch (error) {
+      console.error('Transaction failed:', error);
+    }
+  };
+
+  // Function to handle Start Game button click
+  const handleStartGame = async () => {
+    if (!wallet) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
+    // Calculate total bet amount
+    const totalBet = Object.values(selectedChips).reduce((sum, chips) => {
+      return sum + chips.reduce((chipSum, chip) => chipSum + chip.value, 0);
+    }, 0);
+
+    // Send the bet amount to the contract
+    await sendTonTokens(totalBet * 1e9); // Convert to nanoton
+
+    // Generate a random winning number (0 to 36)
+    const randomNumber = Math.floor(Math.random() * 37);
+    setWinningNumber(randomNumber); // Set the winning number
+    setIsGameStarted(true); // Trigger the transition
+
+    // Check if the player won
+    const selectedValues = Object.keys(selectedChips);
+    let prizePool = 0;
+    let hasWon = false;
+
+    selectedValues.forEach((value) => {
+      if (value === 'odd' && randomNumber % 2 !== 0 && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for odd
+      } else if (value === 'even' && randomNumber % 2 === 0 && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for even
+      } else if (value === 'red' && red_numbers.includes(randomNumber)) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for red
+      } else if (value === 'black' && !red_numbers.includes(randomNumber) && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for black
+      } else if (value === '1-12' && randomNumber >= 1 && randomNumber <= 12) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 1-12
+      } else if (value === '13-24' && randomNumber >= 13 && randomNumber <= 24) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 13-24
+      } else if (value === '25-36' && randomNumber >= 25 && randomNumber <= 36) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3; // 3x payout for 25-36
+      } else if (value === '1-18' && randomNumber >= 1 && randomNumber <= 18) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for 1-18
+      } else if (value === '19-36' && randomNumber >= 19 && randomNumber <= 36) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2; // 2x payout for 19-36
+      } else if (Number(value) === randomNumber) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 36; // 36x payout for exact number
+      }
     });
+
+    // Log the result
+    if (hasWon) {
+      console.log(`You won! Winning number: ${randomNumber}. Prize pool: $${prizePool}`);
+      // Send the prize pool to the player's wallet
+      await sendTonTokens(prizePool * 1e9); // Convert to nanoton
+    } else {
+      console.log(`You lost. Winning number: ${randomNumber}. Prize pool: $0`);
+    }
+
+    // Reset the game after 3 seconds
+    setTimeout(() => {
+      setIsGameStarted(false); // Re-enable clicks
+      setSelectedChips({}); // Remove all chips
+      setWinningNumber(null); // Clear the winning number
+    }, 3000); // 3-second delay before resetting
   };
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
       <div className="roulette-header">
-        <img src={RouletteImage} alt="Roulette" className="roulette-image" />
-        {wallet ? (
-          <div>
-            <span className="wallet-address">
-              {formattedAddress.slice(0, 5)}...
-              {formattedAddress.slice(-5)}
-            </span>
-            <button className="disconnect-button" onClick={disconnect}>
-              Disconnect
-            </button>
-          </div>
-        ) : (
-          <img
-            src={TonWallet}
-            alt="Connect Wallet"
-            className="wallet-image"
-            onClick={() => tonConnectUI.connectWallet()}
-          />
-        )}
-      </div>
+  <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+  {wallet ? (
+    <span className="wallet-address">
+      {wallet.account.address.toString().slice(0, 5)}...
+      {wallet.account.address.toString().slice(-5)}
+    </span>
+  ) : (
+    <img
+      src={TonWallet}
+      alt="Connect Wallet"
+      className="wallet-image"
+      onClick={connectWallet}
+    />
+  )}
+</div>
 
       {/* Chip Value Selector */}
       <div className="chip-value-selector">
@@ -132,7 +222,7 @@ const Board = () => {
           ))}
         </div>
         {/* Lobby Name */}
-        <div className="lobby-name">Lobby Name Lg1</div>
+        <div className="lobby-name">Lobby Name</div>
       </div>
 
       {/* Main Grid: Numbers + Special Buttons */}
@@ -241,7 +331,7 @@ const Board = () => {
       </div>
 
       {/* Start Game Button */}
-      <button className="start-game-button" onClick={() => setIsGameStarted(true)}>
+      <button className="start-game-button" onClick={handleStartGame}>
         Start Game
       </button>
     </div>
