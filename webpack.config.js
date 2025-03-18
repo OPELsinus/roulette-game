@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack'); // Import webpack
+const CopyWebpackPlugin = require('copy-webpack-plugin'); // Import CopyWebpackPlugin
+const webpack = require('webpack');
 
 module.exports = {
   entry: './src/index.js',
@@ -34,6 +35,17 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'], // Polyfill Buffer
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'public', // Copy everything from the 'public' directory
+          to: '.', // Paste into the root of the 'build' directory
+          globOptions: {
+            ignore: ['**/index.html'], // Ignore index.html (handled by HtmlWebpackPlugin)
+          },
+        },
+      ],
+    }),
   ],
   resolve: {
     fallback: {
@@ -41,7 +53,7 @@ module.exports = {
     },
   },
   devServer: {
-    static: path.resolve(__dirname, 'dist'),
+    static: path.resolve(__dirname, 'build'), // Serve from the 'build' directory
     compress: true,
     port: 9000,
     open: true,
