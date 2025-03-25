@@ -1,12 +1,12 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+const webpack = require('webpack'); // Import webpack
 
 module.exports = {
   entry: './src/index.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'build'), // Output to 'build' directory
     clean: true,
   },
   module: {
@@ -32,12 +32,12 @@ module.exports = {
       title: 'Roulette Game',
     }),
     new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
+      Buffer: ['buffer', 'Buffer'], // Polyfill Buffer
     }),
   ],
   resolve: {
     fallback: {
-      buffer: require.resolve('buffer'),
+      buffer: require.resolve('buffer'), // Polyfill Buffer
     },
   },
   devServer: {
