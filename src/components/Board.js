@@ -59,8 +59,8 @@ const Board = () => {
     if (rect.height >= 130) {
         console.log('HEIGHT');
         console.log(event.clientX, event.clientY);
-        val x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-        val y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) + 100;
+        val x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 200;
+        val y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) + 1000;
         console.log(x, y);
     }
 
