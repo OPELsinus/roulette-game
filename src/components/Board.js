@@ -42,8 +42,8 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20; // Ensure x is within 0-100%
-    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20; // Ensure y is within 0-100%
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20%; // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20%; // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
@@ -82,12 +82,17 @@ const Board = () => {
       if (!address) return '';
 
       try {
+        // Parse the address (works for both raw and friendly formats)
         const parsedAddress = Address.parse(address);
+
+        // Convert to user-friendly format (UQ... or EQ...)
         const friendlyAddress = parsedAddress.toString();
+
+        // Shorten to first 5 + last 5 chars
         return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
       } catch (e) {
         console.error("Error parsing address:", e);
-        return `${address.slice(0, 5)}...${address.slice(-5)}`;
+        return `${address.slice(0, 5)}...${address.slice(-5)}`; // Fallback
       }
     };
 
