@@ -6,6 +6,9 @@ import TonWallet from './TonWallet.jpg';
 import ClearImage from './Clear.png'; // Add a clear image
 import UndoImage from './Undo.png'; // Add an undo image
 import { Address } from '@ton/core';
+import { Buffer } from 'buffer';
+
+gglobalThis.Buffer = Buffer; // Make Buffer available globally
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
