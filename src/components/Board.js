@@ -79,23 +79,17 @@ const Board = () => {
   };
 
   const formatAddress = (address) => {
-  if (!address) return '';
+      if (!address) return '';
 
-  // Check if the address is already in user-friendly format
-  if (address.startsWith('UQ') || address.startsWith('EQ')) {
-    // This is a raw address, let's convert it to user-friendly format
-    try {
-      // Simple conversion: take first 5 and last 5 characters
-      return `${address.slice(0, 5)}...${address.slice(-5)}`;
-    } catch (e) {
-      console.error("Error formatting address:", e);
-      return address; // fallback to raw address
-    }
-  }
-
-  // If it's already in friendly format, return as is
-  return address;
-};
+      try {
+        const parsedAddress = Address.parse(address);
+        const friendlyAddress = parsedAddress.toString();
+        return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
+      } catch (e) {
+        console.error("Error parsing address:", e);
+        return `${address.slice(0, 5)}...${address.slice(-5)}`;
+      }
+    };
 
   const handleClear = () => {
     setSelectedChips({});
