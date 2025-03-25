@@ -52,7 +52,7 @@ const Board = () => {
     if (rect.width >= 130) {
         console.log('WIDTH');
         console.log(event.clientX, event.clientY);
-        x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) + 10;
+        x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
         y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
         console.log(x, y);
     }
@@ -60,7 +60,7 @@ const Board = () => {
         console.log('HEIGHT');
         console.log(event.clientX, event.clientY);
         x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-        y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) + 10;
+        y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
         console.log(x, y);
     }
     else {
