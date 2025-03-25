@@ -51,13 +51,13 @@ const Board = () => {
     const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
     if (rect.width >= 130) {
         console.log('WIDTH');
-        const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 50;
+        const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) + 10;
         const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
     }
     if (rect.height >= 130) {
         console.log('HEIGHT');
         const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-        const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 60;
+        const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) + 20;
     }
 
 
