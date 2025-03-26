@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
-import ClearImage from './Clear.png'; // Add a clear image
-import UndoImage from './Undo.png'; // Add an undo image
+import ClearImage from './Clear.png';
+import UndoImage from './Undo.png';
 import { Address } from '@ton/core';
 import { Buffer } from 'buffer';
 
@@ -12,9 +12,9 @@ window.Buffer = Buffer;
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
-  [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34], // First column
-  [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], // Second column
-  [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], // Third column
+  [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34],
+  [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35],
+  [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36],
 ];
 
 const specialButtons = [
@@ -29,7 +29,7 @@ const specialButtons = [
   { label: '19-36', value: '19-36' },
 ];
 
-const chipValues = [1, 5, 10, 25, 50, 100]; // Available chip values
+const chipValues = [1, 5, 10, 25, 50, 100];
 
 const Board = () => {
   const [tonConnectUI] = useTonConnectUI();
@@ -38,7 +38,10 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [winningNumber, setWinningNumber] = useState(null);
   const [currentChipValue, setCurrentChipValue] = useState(1);
-  const [chipHistory, setChipHistory] = useState([]); // To track chip history for undo
+  const [chipHistory, setChipHistory] = useState([]);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const rouletteRef = useRef(null);
 
   const isRed = (number) => red_numbers.includes(number);
 
@@ -46,33 +49,26 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    console.log(rect);
     let x, y;
 
     if (rect.width >= 130) {
-        console.log('WIDTH');
-        console.log(event.clientX, event.clientY);
-        x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 5;
-        y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
-        console.log(x, y);
+      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 5;
+      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
     }
     else if (rect.height >= 130) {
-        console.log('HEIGHT');
-        console.log(event.clientX, event.clientY);
-        x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-        y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 5;
-        console.log(x, y);
+      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
+      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 5;
     }
     else {
-        x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-        y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
+      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
+      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
     }
 
     const newChip = {
       id: Date.now(),
       position: { x, y },
       value: currentChipValue,
-      cell: value, // Track which cell the chip belongs to
+      cell: value,
     };
 
     setSelectedChips((prev) => ({
@@ -80,7 +76,6 @@ const Board = () => {
       [value]: [...(prev[value] || []), newChip],
     }));
 
-    // Update chip history for undo functionality
     setChipHistory((prev) => [...prev, { cell: value, chip: newChip }]);
   };
 
@@ -102,22 +97,16 @@ const Board = () => {
   };
 
   const formatAddress = (address) => {
-      if (!address) return '';
-
-      try {
-        // Parse the address (works for both raw and friendly formats)
-        const parsedAddress = Address.parse(address);
-
-        // Convert to user-friendly format (UQ... or EQ...)
-        const friendlyAddress = parsedAddress.toString();
-
-        // Shorten to first 5 + last 5 chars
-        return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
-      } catch (e) {
-        console.error("Error parsing address:", e);
-        return `${address.slice(0, 5)}...${address.slice(-5)}`; // Fallback
-      }
-    };
+    if (!address) return '';
+    try {
+      const parsedAddress = Address.parse(address);
+      const friendlyAddress = parsedAddress.toString();
+      return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
+    } catch (e) {
+      console.error("Error parsing address:", e);
+      return `${address.slice(0, 5)}...${address.slice(-5)}`;
+    }
+  };
 
   const handleClear = () => {
     setSelectedChips({});
@@ -126,22 +115,19 @@ const Board = () => {
 
   const handleUndo = () => {
     if (chipHistory.length === 0) return;
-
     const lastAction = chipHistory[chipHistory.length - 1];
     const updatedChips = { ...selectedChips };
 
-    // Remove the last chip from the cell
     updatedChips[lastAction.cell] = updatedChips[lastAction.cell].filter(
       (chip) => chip.id !== lastAction.chip.id
     );
 
-    // If the cell is empty, remove it from the object
     if (updatedChips[lastAction.cell].length === 0) {
       delete updatedChips[lastAction.cell];
     }
 
     setSelectedChips(updatedChips);
-    setChipHistory((prev) => prev.slice(0, -1)); // Remove the last action from history
+    setChipHistory((prev) => prev.slice(0, -1));
   };
 
   const sendTonTokens = async (amount) => {
@@ -183,6 +169,11 @@ const Board = () => {
     const randomNumber = Math.floor(Math.random() * 37);
     setWinningNumber(randomNumber);
     setIsGameStarted(true);
+    setIsSpinning(true);
+
+    const segmentAngle = 360 / 37;
+    const finalRotation = 5 * 360 + (randomNumber * segmentAngle);
+    setRotation(finalRotation);
 
     const selectedValues = Object.keys(selectedChips);
     let prizePool = 0;
@@ -230,17 +221,27 @@ const Board = () => {
     }
 
     setTimeout(() => {
+      setIsSpinning(false);
       setIsGameStarted(false);
       setSelectedChips({});
       setWinningNumber(null);
-      setChipHistory([]); // Clear chip history after game ends
-    }, 3000);
+      setChipHistory([]);
+    }, 4000);
   };
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
       <div className="roulette-header">
-        <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+        <div
+          ref={rouletteRef}
+          className="roulette-wheel-container"
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.21, 0.99)' : 'none'
+          }}
+        >
+          <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+        </div>
         {wallet ? (
           <div className="wallet-info">
             <span className="wallet-address">
