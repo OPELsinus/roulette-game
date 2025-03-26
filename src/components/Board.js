@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
@@ -31,6 +31,70 @@ const specialButtons = [
 
 const chipValues = [1, 5, 10, 25, 50, 100];
 
+const RouletteWheel = ({ winningNumber, isSpinning }) => {
+  const wheelRef = useRef(null);
+  const ballRef = useRef(null);
+  const [ballPosition, setBallPosition] = useState(0);
+
+  useEffect(() => {
+    if (isSpinning) {
+      // Reset ball position
+      setBallPosition(0);
+
+      // Spin wheel
+      wheelRef.current.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
+      wheelRef.current.style.transform = 'rotate(1440deg)'; // 4 full rotations
+
+      // Animate ball
+      const ballAnimation = ballRef.current.animate(
+        [
+          { transform: 'translateX(0) rotate(0deg)', offset: 0 },
+          { transform: 'translateX(50px) rotate(180deg)', offset: 0.25 },
+          { transform: 'translateX(100px) rotate(360deg)', offset: 0.5 },
+          { transform: 'translateX(50px) rotate(540deg)', offset: 0.75 },
+          { transform: 'translateX(0) rotate(720deg)', offset: 1 }
+        ],
+        {
+          duration: 4000,
+          easing: 'cubic-bezier(0.1, 0.7, 0.1, 1)'
+        }
+      );
+
+      // Calculate final ball position based on winning number
+      const segmentAngle = 360 / 37;
+      const finalBallPosition = (winningNumber * segmentAngle) + 180; // Offset by 180deg for better visual
+
+      setTimeout(() => {
+        wheelRef.current.style.transition = 'none';
+        wheelRef.current.style.transform = `rotate(${-finalBallPosition}deg)`;
+        setBallPosition(finalBallPosition);
+      }, 4000);
+
+      return () => {
+        ballAnimation.cancel();
+      };
+    }
+  }, [isSpinning, winningNumber]);
+
+  return (
+    <div className="roulette-container">
+      <div className="roulette-wheel" ref={wheelRef}>
+        {Array.from({ length: 37 }).map((_, i) => (
+          <div
+            key={i}
+            className={`wheel-number ${i === 0 ? 'green' : red_numbers.includes(i) ? 'red' : 'black'}`}
+            style={{ transform: `rotate(${i * (360/37)}deg)` }}
+          >
+            <span>{i}</span>
+          </div>
+        ))}
+      </div>
+      <div className="roulette-ball" ref={ballRef} style={{ transform: `rotate(${ballPosition}deg)` }} />
+      <div className="roulette-pointer" />
+    </div>
+  );
+};
+
 const Board = () => {
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
@@ -40,8 +104,7 @@ const Board = () => {
   const [currentChipValue, setCurrentChipValue] = useState(1);
   const [chipHistory, setChipHistory] = useState([]);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [rotation, setRotation] = useState(0);
-  const rouletteRef = useRef(null);
+  const [showWheel, setShowWheel] = useState(false);
 
   const isRed = (number) => red_numbers.includes(number);
 
@@ -169,79 +232,32 @@ const Board = () => {
     const randomNumber = Math.floor(Math.random() * 37);
     setWinningNumber(randomNumber);
     setIsGameStarted(true);
+    setShowWheel(true);
     setIsSpinning(true);
-
-    const segmentAngle = 360 / 37;
-    const finalRotation = 5 * 360 + (randomNumber * segmentAngle);
-    setRotation(finalRotation);
-
-    const selectedValues = Object.keys(selectedChips);
-    let prizePool = 0;
-    let hasWon = false;
-
-    selectedValues.forEach((value) => {
-      if (value === 'odd' && randomNumber % 2 !== 0 && randomNumber !== 0) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (value === 'even' && randomNumber % 2 === 0 && randomNumber !== 0) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (value === 'red' && red_numbers.includes(randomNumber)) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (value === 'black' && !red_numbers.includes(randomNumber) && randomNumber !== 0) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (value === '1-12' && randomNumber >= 1 && randomNumber <= 12) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
-      } else if (value === '13-24' && randomNumber >= 13 && randomNumber <= 24) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
-      } else if (value === '25-36' && randomNumber >= 25 && randomNumber <= 36) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
-      } else if (value === '1-18' && randomNumber >= 1 && randomNumber <= 18) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (value === '19-36' && randomNumber >= 19 && randomNumber <= 36) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
-      } else if (Number(value) === randomNumber) {
-        hasWon = true;
-        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 36;
-      }
-    });
-
-    if (hasWon) {
-      console.log(`You won! Winning number: ${randomNumber}. Prize pool: $${prizePool}`);
-      await sendTonTokens(prizePool * 1e9);
-    } else {
-      console.log(`You lost. Winning number: ${randomNumber}. Prize pool: $0`);
-    }
 
     setTimeout(() => {
       setIsSpinning(false);
+    }, 4000);
+
+    setTimeout(() => {
+      setShowWheel(false);
       setIsGameStarted(false);
       setSelectedChips({});
       setWinningNumber(null);
       setChipHistory([]);
-    }, 4000);
+    }, 7000);
   };
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
-      <div className="roulette-header">
-        <div
-          ref={rouletteRef}
-          className="roulette-wheel-container"
-          style={{
-            transform: `rotate(${rotation}deg)`,
-            transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.21, 0.99)' : 'none'
-          }}
-        >
-          <img src={RouletteImage} alt="Roulette" className="roulette-image" />
+      {showWheel && (
+        <div className="roulette-overlay">
+          <RouletteWheel winningNumber={winningNumber} isSpinning={isSpinning} />
         </div>
+      )}
+
+      <div className="roulette-header">
+        <img src={RouletteImage} alt="Roulette" className="roulette-logo" />
         {wallet ? (
           <div className="wallet-info">
             <span className="wallet-address">
