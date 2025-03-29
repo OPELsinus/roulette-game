@@ -1,8 +1,3 @@
-import { Buffer } from 'buffer';
-
-// Polyfill Buffer globally
-window.Buffer = Buffer;
-
 import React from 'react';
 import { createRoot } from 'react-dom/client'; // Import createRoot
 import App from './App';

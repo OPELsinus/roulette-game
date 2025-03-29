@@ -5,10 +5,6 @@ import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
 import ClearImage from './Clear.png'; // Add a clear image
 import UndoImage from './Undo.png'; // Add an undo image
-import { Address } from '@ton/core';
-import { Buffer } from 'buffer';
-
-window.Buffer = Buffer;
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
@@ -94,17 +90,10 @@ const Board = () => {
     }
   };
 
-
   const formatAddress = (address) => {
     if (!address) return '';
-    try {
-      const parsedAddress = Address.parse(address);
-      const friendlyAddress = parsedAddress.toString();
-      return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
-    } catch (e) {
-      console.error("Error parsing address:", e);
-      return `${address.slice(0, 5)}...${address.slice(-5)}`;
-    }
+
+    return `Wallet Connected`;
   };
 
   const handleClear = () => {
