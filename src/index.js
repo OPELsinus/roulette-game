@@ -1,15 +1,14 @@
-import { Buffer } from 'buffer';
-
-// Polyfill Buffer globally
-window.Buffer = Buffer;
-
-// Your existing code
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client'; // Import createRoot
 import App from './App';
-import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// Get the root element
+const container = document.getElementById('root');
+
+// Create a root
+const root = createRoot(container);
+
+// Render the App component
 root.render(
   <React.StrictMode>
     <App />

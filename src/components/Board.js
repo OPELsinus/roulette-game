@@ -1,20 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import './Board.css';
 import RouletteImage from './Roulette.png';
 import TonWallet from './TonWallet.jpg';
-import ClearImage from './Clear.png';
-import UndoImage from './Undo.png';
-import { Address } from '@ton/core';
-import { Buffer } from 'buffer';
-
-window.Buffer = Buffer;
+import ClearImage from './Clear.png'; // Add a clear image
+import UndoImage from './Undo.png'; // Add an undo image
 
 const red_numbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const numbers = [
-  [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34],
-  [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35],
-  [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36],
+  [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34], // First column
+  [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], // Second column
+  [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], // Third column
 ];
 
 const specialButtons = [
@@ -29,71 +25,7 @@ const specialButtons = [
   { label: '19-36', value: '19-36' },
 ];
 
-const chipValues = [1, 5, 10, 25, 50, 100];
-
-const RouletteWheel = ({ winningNumber, isSpinning }) => {
-  const wheelRef = useRef(null);
-  const ballRef = useRef(null);
-  const [ballPosition, setBallPosition] = useState(0);
-
-  useEffect(() => {
-    if (isSpinning) {
-      // Reset ball position
-      setBallPosition(0);
-
-      // Spin wheel
-      wheelRef.current.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
-      wheelRef.current.style.transform = 'rotate(1440deg)'; // 4 full rotations
-
-      // Animate ball
-      const ballAnimation = ballRef.current.animate(
-        [
-          { transform: 'translateX(0) rotate(0deg)', offset: 0 },
-          { transform: 'translateX(50px) rotate(180deg)', offset: 0.25 },
-          { transform: 'translateX(100px) rotate(360deg)', offset: 0.5 },
-          { transform: 'translateX(50px) rotate(540deg)', offset: 0.75 },
-          { transform: 'translateX(0) rotate(720deg)', offset: 1 }
-        ],
-        {
-          duration: 4000,
-          easing: 'cubic-bezier(0.1, 0.7, 0.1, 1)'
-        }
-      );
-
-      // Calculate final ball position based on winning number
-      const segmentAngle = 360 / 37;
-      const finalBallPosition = (winningNumber * segmentAngle) + 180; // Offset by 180deg for better visual
-
-      setTimeout(() => {
-        wheelRef.current.style.transition = 'none';
-        wheelRef.current.style.transform = `rotate(${-finalBallPosition}deg)`;
-        setBallPosition(finalBallPosition);
-      }, 4000);
-
-      return () => {
-        ballAnimation.cancel();
-      };
-    }
-  }, [isSpinning, winningNumber]);
-
-  return (
-    <div className="roulette-container">
-      <div className="roulette-wheel" ref={wheelRef}>
-        {Array.from({ length: 37 }).map((_, i) => (
-          <div
-            key={i}
-            className={`wheel-number ${i === 0 ? 'green' : red_numbers.includes(i) ? 'red' : 'black'}`}
-            style={{ transform: `rotate(${i * (360/37)}deg)` }}
-          >
-            <span>{i}</span>
-          </div>
-        ))}
-      </div>
-      <div className="roulette-ball" ref={ballRef} style={{ transform: `rotate(${ballPosition}deg)` }} />
-      <div className="roulette-pointer" />
-    </div>
-  );
-};
+const chipValues = [1, 5, 10, 25, 50, 100]; // Available chip values
 
 const Board = () => {
   const [tonConnectUI] = useTonConnectUI();
@@ -102,9 +34,7 @@ const Board = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [winningNumber, setWinningNumber] = useState(null);
   const [currentChipValue, setCurrentChipValue] = useState(1);
-  const [chipHistory, setChipHistory] = useState([]);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [showWheel, setShowWheel] = useState(false);
+  const [chipHistory, setChipHistory] = useState([]); // To track chip history for undo
 
   const isRed = (number) => red_numbers.includes(number);
 
@@ -112,26 +42,14 @@ const Board = () => {
     if (isGameStarted || !wallet) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    let x, y;
-
-    if (rect.width >= 130) {
-      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 5;
-      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
-    }
-    else if (rect.height >= 130) {
-      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 5;
-    }
-    else {
-      x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20;
-      y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20;
-    }
+    const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)) - 20; // Ensure x is within 0-100%
+    const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)) - 20; // Ensure y is within 0-100%
 
     const newChip = {
       id: Date.now(),
       position: { x, y },
       value: currentChipValue,
-      cell: value,
+      cell: value, // Track which cell the chip belongs to
     };
 
     setSelectedChips((prev) => ({
@@ -139,6 +57,7 @@ const Board = () => {
       [value]: [...(prev[value] || []), newChip],
     }));
 
+    // Update chip history for undo functionality
     setChipHistory((prev) => [...prev, { cell: value, chip: newChip }]);
   };
 
@@ -161,14 +80,8 @@ const Board = () => {
 
   const formatAddress = (address) => {
     if (!address) return '';
-    try {
-      const parsedAddress = Address.parse(address);
-      const friendlyAddress = parsedAddress.toString();
-      return `${friendlyAddress.slice(0, 5)}...${friendlyAddress.slice(-5)}`;
-    } catch (e) {
-      console.error("Error parsing address:", e);
-      return `${address.slice(0, 5)}...${address.slice(-5)}`;
-    }
+
+    return `${address.slice(0, 5)}...${address.slice(-5)}`;
   };
 
   const handleClear = () => {
@@ -178,19 +91,22 @@ const Board = () => {
 
   const handleUndo = () => {
     if (chipHistory.length === 0) return;
+
     const lastAction = chipHistory[chipHistory.length - 1];
     const updatedChips = { ...selectedChips };
 
+    // Remove the last chip from the cell
     updatedChips[lastAction.cell] = updatedChips[lastAction.cell].filter(
       (chip) => chip.id !== lastAction.chip.id
     );
 
+    // If the cell is empty, remove it from the object
     if (updatedChips[lastAction.cell].length === 0) {
       delete updatedChips[lastAction.cell];
     }
 
     setSelectedChips(updatedChips);
-    setChipHistory((prev) => prev.slice(0, -1));
+    setChipHistory((prev) => prev.slice(0, -1)); // Remove the last action from history
   };
 
   const sendTonTokens = async (amount) => {
@@ -232,32 +148,64 @@ const Board = () => {
     const randomNumber = Math.floor(Math.random() * 37);
     setWinningNumber(randomNumber);
     setIsGameStarted(true);
-    setShowWheel(true);
-    setIsSpinning(true);
+
+    const selectedValues = Object.keys(selectedChips);
+    let prizePool = 0;
+    let hasWon = false;
+
+    selectedValues.forEach((value) => {
+      if (value === 'odd' && randomNumber % 2 !== 0 && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (value === 'even' && randomNumber % 2 === 0 && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (value === 'red' && red_numbers.includes(randomNumber)) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (value === 'black' && !red_numbers.includes(randomNumber) && randomNumber !== 0) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (value === '1-12' && randomNumber >= 1 && randomNumber <= 12) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
+      } else if (value === '13-24' && randomNumber >= 13 && randomNumber <= 24) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
+      } else if (value === '25-36' && randomNumber >= 25 && randomNumber <= 36) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 3;
+      } else if (value === '1-18' && randomNumber >= 1 && randomNumber <= 18) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (value === '19-36' && randomNumber >= 19 && randomNumber <= 36) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 2;
+      } else if (Number(value) === randomNumber) {
+        hasWon = true;
+        prizePool += selectedChips[value].reduce((sum, chip) => sum + chip.value, 0) * 36;
+      }
+    });
+
+    if (hasWon) {
+      console.log(`You won! Winning number: ${randomNumber}. Prize pool: $${prizePool}`);
+      await sendTonTokens(prizePool * 1e9);
+    } else {
+      console.log(`You lost. Winning number: ${randomNumber}. Prize pool: $0`);
+    }
 
     setTimeout(() => {
-      setIsSpinning(false);
-    }, 4000);
-
-    setTimeout(() => {
-      setShowWheel(false);
       setIsGameStarted(false);
       setSelectedChips({});
       setWinningNumber(null);
-      setChipHistory([]);
-    }, 7000);
+      setChipHistory([]); // Clear chip history after game ends
+    }, 3000);
   };
 
   return (
     <div className={`board ${isGameStarted ? 'game-started' : ''}`}>
-      {showWheel && (
-        <div className="roulette-overlay">
-          <RouletteWheel winningNumber={winningNumber} isSpinning={isSpinning} />
-        </div>
-      )}
-
       <div className="roulette-header">
-        <img src={RouletteImage} alt="Roulette" className="roulette-logo" />
+        <img src={RouletteImage} alt="Roulette" className="roulette-image" />
         {wallet ? (
           <div className="wallet-info">
             <span className="wallet-address">
