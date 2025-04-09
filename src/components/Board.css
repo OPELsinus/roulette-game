@@ -360,3 +360,239 @@
   cursor: pointer;
   margin-top: -5%;
 }
+
+/* Board.css */
+/* ... (keep your existing styles) ... */
+
+/* Add CSS Variables for chip colors */
+:root {
+  --chip-1: #d32f2f;   /* Red */
+  --chip-5: #303f9f;   /* Blue */
+  --chip-10: #00796b;  /* Green */
+  --chip-25: #388e3c; /* Darker Green */
+  --chip-50: #fbc02d;  /* Yellow */
+  --chip-100: #5d4037; /* Brown */
+}
+
+.board.spinning .betting-area,
+.board.spinning .chip-value-selector button,
+.board.spinning .action-button {
+  opacity: 0.6;
+  pointer-events: none; /* Prevent interaction while spinning */
+}
+
+.action-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.start-game-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.game-message {
+  text-align: center;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 8px;
+  background-color: rgba(255, 255, 0, 0.8); /* Yellowish background */
+  color: #333;
+  border-radius: 4px;
+  border: 1px solid #fbc02d;
+}
+
+.roulette-wheel-section {
+  position: relative; /* Needed for absolute positioning of number display */
+  margin-bottom: 20px;
+  display: flex; /* Use flex to center canvas and overlay */
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Style for cells with chips */
+.cell.has-chips {
+  /* Maybe a subtle border or background change */
+   /* background-color: rgba(255, 255, 255, 0.1); */
+}
+
+/* Chip styling improvements */
+.chip {
+  position: absolute;
+  width: 24px; /* Adjust size as needed */
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  font-size: 10px; /* Adjust font size */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+  cursor: pointer; /* Indicate it's related to interaction */
+  z-index: 5; /* Ensure chips are above cell background */
+  /* Background color set dynamically */
+  transform: translate(-50%, -50%); /* Center chip exactly on calculated % */
+  line-height: 1; /* Ensure text centers vertically */
+}
+
+
+/* Add background colors for Red/Black special buttons */
+.cell.special.red-bg {
+  background-color: #D00000;
+  color: white;
+}
+.cell.special.black-bg {
+   background-color: #000000;
+   color: white;
+ }
+
+/* Ensure header elements are styled appropriately */
+.roulette-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333; /* Example background */
+    color: white;
+}
+
+.roulette-logo-image {
+    height: 50px; /* Adjust as needed */
+}
+
+.wallet-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wallet-address {
+    background-color: #555;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.disconnect-button {
+    padding: 5px 10px;
+    background-color: #D00000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.disconnect-button:hover {
+    background-color: #a00000;
+}
+
+.wallet-image {
+    height: 40px; /* Adjust */
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Adjust betting area layout if necessary */
+.betting-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center columns */
+  margin-top: 20px;
+}
+
+.main-grid {
+  display: flex;
+  /* Adjust gap or alignment as needed */
+}
+
+.number-columns {
+    display: flex;
+    flex-grow: 3; /* Give number columns more space */
+}
+
+.special-columns {
+    display: flex;
+    flex-grow: 1; /* Give special columns less space */
+     /* Add some spacing */
+    margin-left: 5px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+     margin: 0 1px; /* Minimal gap between columns */
+}
+
+.cell {
+  /* Ensure consistent sizing and styling */
+  /* ... existing cell styles ... */
+   position: relative; /* Needed for absolute positioning of chips */
+    min-width: 50px; /* Example minimum size */
+    min-height: 40px; /* Example minimum size */
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+.cell.number {
+    /* Styles for number cells */
+}
+.cell.special {
+    /* Styles for special bet cells */
+    min-height: 60px; /* Example height */
+     padding: 5px;
+     font-size: 0.9em;
+     text-align: center;
+}
+.cell.zero {
+  /* Styles for zero */
+   min-height: 124px; /* Span approx 3 rows height */
+   writing-mode: vertical-rl; /* Rotate text if desired */
+   text-orientation: mixed;
+   width: 40px;
+}
+
+.zero-row {
+    display: flex;
+    width: 100%;
+    align-items: stretch; /* Make items fill height */
+    margin-bottom: 2px;
+}
+
+.zero-row .cell.zero {
+    flex-grow: 0; /* Don't let zero grow */
+    flex-shrink: 0;
+    width: 50px; /* Match cell width */
+    min-height: 0; /* Override previous min-height */
+    height: auto; /* Let it size naturally */
+    writing-mode: horizontal-tb; /* Keep 0 horizontal */
+    text-orientation: mixed;
+    margin-right: 5px; /* Space between 0 and buttons */
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    justify-content: space-around; /* Distribute space */
+    margin-left: 10px; /* Space from zero cell */
+}
+
+.action-button {
+    width: 30px; /* Adjust size */
+    height: 30px;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background-color: #eee;
+}
+.action-button:hover {
+    background-color: #ddd;
+}
